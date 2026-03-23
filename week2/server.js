@@ -1,46 +1,39 @@
-var express = require("express")
-const path = require('path');
-var app = express()
-var port = process.env.port || 3001;
+// server.js
+const express = require("express");
+const path = require("path");
 
-// Middleware to parse JSON bodies (for POST requests)
-app.use(express.json());
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-// Serve static files from the "public" folder
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from "public" folder
+app.use(express.static(path.join(__dirname, "public")));
 
-// In-memory array to store quotes
-let quotes = [
-  "The best way to predict the future is to invent it.",
-  "Life is 10% what happens to us and 90% how we react to it.",
-  "The only limit to our realization of tomorrow is our doubts of today.",
-  "Do not wait to strike till the iron is hot; but make it hot by striking."
+// In-memory array of jokes
+const jokes = [
+  "Why don't scientists trust atoms? Because they make up everything!",
+  "Why did the math book look sad? Because it had too many problems.",
+  "I told my computer I needed a break, and it said 'No problem, I'll go to sleep.'",
+  "Why do programmers prefer dark mode? Because light attracts bugs!",
+  "Why did the scarecrow win an award? Because he was outstanding in his field!"
 ];
 
-// GET endpoint to retrieve a random quote
-// Usage example: http://localhost:3000/api/quote
-app.get('/api/quote', (req, res) => {
-  const randomIndex = Math.floor(Math.random() * quotes.length);
-  res.json({ quote: quotes[randomIndex] });
+// GET endpoint to fetch a random joke
+app.get("/api/joke", (req, res) => {
+  const randomIndex = Math.floor(Math.random() * jokes.length);
+  res.json({ joke: jokes[randomIndex] });
 });
 
-// Optional: POST endpoint to add a new quote
-// Example POST body: { "quote": "Your new inspirational quote." }
-app.post('/api/quote', (req, res) => {
-  const { quote } = req.body;
-  if (!quote || typeof quote !== 'string') {
-    return res.status(400).json({ error: 'Please provide a valid quote.' });
+// Optional: POST endpoint to add a new joke
+app.use(express.json());
+app.post("/api/joke", (req, res) => {
+  const { joke } = req.body;
+  if (!joke || typeof joke !== "string") {
+    return res.status(400).json({ error: "Please provide a valid joke." });
   }
-  quotes.push(quote);
-  res.json({ message: 'Quote added successfully.', quotes });
+  jokes.push(joke);
+  res.json({ message: "Joke added!", jokes });
 });
 
-// Additional example endpoint to check server health
-app.get('/health', (req, res) => {
-  res.send('Server is healthy!');
-});
-
-
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
