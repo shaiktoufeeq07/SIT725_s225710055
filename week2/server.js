@@ -23,7 +23,7 @@ app.get("/api/joke", (req, res) => {
   res.json({ joke: jokes[randomIndex] });
 });
 
-// Optional: POST endpoint to add a new joke
+// POST endpoint to add a new joke
 app.use(express.json());
 app.post("/api/joke", (req, res) => {
   const { joke } = req.body;
