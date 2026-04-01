@@ -18,7 +18,7 @@ const clickMe = () => {
     formData.last_name = $("#last_name").val();
     formData.email = $("#email").val();
     formData.message = $("#message").val();
-    console.log("form data submitted", formData);
+    console.log("form data submitted",formData);
 }
 const addCards = (items) => {
     items.forEach(item => {
@@ -37,8 +37,11 @@ $(document).ready(function () {
     $('.materialboxed').materialbox();
     $('.modal').modal();
     $('#clickMeButton').click(() => {
-        $('#modal1').modal('open');
-        clickMe();
-    })
+    $('#modal1').modal('open');
+});
+
+$('#formSubmit').click(() => {
+    clickMe();
+});
     addCards(cardList);
 });
