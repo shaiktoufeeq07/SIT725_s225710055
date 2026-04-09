@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SIT 725 Prac 3</title>
+    <meta name="description" content="basic template for SIT 725 Prac 3">
+    <meta name="author" content="SitePoint">
+    <meta property="og:title" content="SIT 725 Prac 3">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="basic template for SIT 725 Prac 3">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom Style Sheet-->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <nav>
+        <div class="nav-wrapper navbar-size">
+            <a href="#" class="brand-logo">
+                <img class="user-image-size"
+                    src="https://static.vecteezy.com/system/resources/previews/005/005/788/non_2x/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector.jpg" />
+            </a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a target="_blank" href="https://github.com/shaiktoufeeq07">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-body">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 center-align">
+                    <h1 class="heading">Welcome to Protein Stack!! Your Ultimate Protein Solution</h1>
+                    <p class="text">Discover the best protein supplements for your fitness journey.</p>
+                </div>
+                <div class="col s12 center-align">
+                    <img class="materialboxed materialboxed-image"
+                        src="https://cdn-icons-png.flaticon.com/512/4773/4773415.png">
+                </div>
+                <div class="col s12 center-align">
+                    <a class="waves-effect waves-light btn click-me-button modal-trigger"
+                        id="clickMeButton"
+                        href="#modal1">
+                        <i class="material-icons left">auto_fix_high</i>Sign Up
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards loaded from MongoDB -->
+        <div class="row" id="card-section"></div>
+
+    </main><!-- ✅ main is now properly closed -->
+
+    <!-- ✅ Modal moved OUTSIDE main and card-section, directly inside body -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h4>Sign Up</h4>
+            <div class="row">
+                <div class="input-field col s6">
+                    <input id="first_name" type="text" class="validate">
+                    <label for="first_name">First Name</label>
+                </div>
+                <div class="input-field col s6">
+                    <input id="last_name" type="text" class="validate">
+                    <label for="last_name">Last Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="password" type="password" class="validate">
+                    <label for="password">Password</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="email" type="email" class="validate">
+                    <label for="email">Email</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="message" type="text" class="validate">
+                    <label for="message">Message</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="waves-effect waves-light btn" id="formSubmit">Submit</a>
+            <a class="modal-close waves-effect waves-red btn-flat">Cancel</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+.navbar-size {
+width: 95%;
+margin: 0 auto;
+
+}
+.brand-logo {
+position: relative;
+display: flex;
+align-items: center;
+height: 100%;
+}
+nav .brand-logo img {
+display: block;
+height: 50px;
+border-radius: 50%;
+
+}
+.main-body {
+background-color:#217fcc;
+color: white;
+height: calc(100vh - 64px);
+}
+.materialboxed-image {
+margin: 0 auto;
+height: 400px;
+}
+.card {
+max-width: 325px;
+margin: 1rem auto;
+height: 400px;
+}
+.card-image img {
+max-height: 220px;
+width: 100%;
+object-fit: cover;
+}
+.click-me-button{
+background-color: red;
+margin-top: 50px;
+border: 25px;
+}
+.card-reveal {
+color: black;
+}
+.card-reveal .card-title,
+.card-reveal p {
+color: black;
+}
+.text{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: larger;
+    font-style: italic;
+}
+.heading{
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color: black;
+}
