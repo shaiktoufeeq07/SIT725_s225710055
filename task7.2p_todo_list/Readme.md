@@ -1,11 +1,11 @@
-# ⚡ Collaborative To-Do List (Socket.IO)
+#  Collaborative To-Do List (Socket.IO)
 
 A real-time collaborative task manager built with **Express** and **Socket.IO**.  
 Every connected browser tab sees task changes (add, complete, delete) instantly — no refresh needed.
 
 ---
 
-## 🚀 How to run
+## How to run
 
 ```bash
 # 1. Install dependencies
@@ -22,7 +22,7 @@ Open **two tabs** side by side to see real-time sync in action!
 
 ---
 
-## 📁 Project structure
+## Project structure
 
 ```
 todo-app/
@@ -35,7 +35,7 @@ todo-app/
 
 ---
 
-## 🔌 Socket.IO Events
+## Socket.IO Events
 
 | Event | Direction | Description |
 |---|---|---|
