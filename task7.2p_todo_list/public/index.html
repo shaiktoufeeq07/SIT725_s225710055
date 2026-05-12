@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collab To-Do</title>
+
+  <!-- Socket.IO client – served automatically by Socket.IO server -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <style>
+    /* ── Google Font ── */
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;500&display=swap');
+
+    :root {
+      --bg: #0f0f11;
+      --card: #1a1a1f;
+      --accent: #c8f04b;
+      --accent2: #4bf0c8;
+      --text: #f0f0ec;
+      --muted: #666;
+      --done: #333;
+      --border: #2a2a30;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px 80px;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    header h1 {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      letter-spacing: -1px;
+      color: var(--accent);
+    }
+
+    header p {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    /* ── Live badge ── */
+    #status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    #status .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background 0.3s;
+    }
+    #status.connected .dot { background: var(--accent); animation: pulse 1.5s infinite; }
+    #status.connected { color: var(--accent); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── Main card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 560px;
+      overflow: hidden;
+    }
+
+    /* ── Input row ── */
+    .input-row {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #taskInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      padding: 18px 20px;
+    }
+    #taskInput::placeholder { color: var(--muted); }
+
+    #addBtn {
+      background: var(--accent);
+      color: #0f0f11;
+      border: none;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    #addBtn:hover { background: var(--accent2); }
+
+    /* ── Task list ── */
+    #taskList {
+      list-style: none;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    #taskList li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+      animation: slideIn 0.25s ease;
+    }
+    #taskList li:last-child { border-bottom: none; }
+    #taskList li:hover { background: rgba(255,255,255,0.03); }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* custom checkbox */
+    .check {
+      width: 20px; height: 20px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .check:hover { border-color: var(--accent); }
+    li.done .check {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .check svg { display: none; }
+    li.done .check svg { display: block; }
+
+    .task-text {
+      flex: 1;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      transition: color 0.2s, text-decoration 0.2s;
+    }
+    li.done .task-text {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .del-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1.1rem;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+      line-height: 1;
+    }
+    .del-btn:hover { color: #ff5f5f; background: rgba(255,95,95,0.1); }
+
+    /* ── Empty state ── */
+    #empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* ── Footer counter ── */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--accent2);
+      color: #0f0f11;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      padding: 10px 20px;
+      border-radius: 100px;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1> Collab To-Do</h1>
+  <p>Tasks sync live across every connected browser tab.</p>
+  <div id="status">
+    <span class="dot"></span>
+    <span id="statusText">Connecting…</span>
+  </div>
+</header>
+
+<div class="card">
+  <!-- Input -->
+  <div class="input-row">
+    <input id="taskInput" type="text" placeholder="Add a new task and press Enter…" maxlength="120" />
+    <button id="addBtn">+ ADD</button>
+  </div>
+
+  <!-- Task list -->
+  <ul id="taskList">
+    <li id="empty"><span>No tasks yet. Add one above!</span></li>
+  </ul>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span id="totalCount">0 tasks</span>
+    <span id="doneCount">0 done</span>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // ── Connect to the Socket.IO server ──────────────
+  // No URL needed – it connects back to the same host
+  const socket = io();
+
+  // ── DOM refs ────────────────────────────────────
+  const input     = document.getElementById('taskInput');
+  const addBtn    = document.getElementById('addBtn');
+  const list      = document.getElementById('taskList');
+  const empty     = document.getElementById('empty');
+  const totalEl   = document.getElementById('totalCount');
+  const doneEl    = document.getElementById('doneCount');
+  const statusEl  = document.getElementById('status');
+  const statusTxt = document.getElementById('statusText');
+  const toast     = document.getElementById('toast');
+
+  
+  let tasks = [];
+
+
+  //  Helper: re-render the whole list from `tasks`
+ 
+  function renderAll() {
+    list.innerHTML = '';
+
+    if (tasks.length === 0) {
+      list.appendChild(empty);
+      totalEl.textContent = '0 tasks';
+      doneEl.textContent  = '0 done';
+      return;
+    }
+
+    tasks.forEach(renderTask);
+    totalEl.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
+    const done = tasks.filter(t => t.completed).length;
+    doneEl.textContent  = `${done} done`;
+  }
+
+  
+  //  Helper: build and append one <li> for a task
+  
+  function renderTask(task) {
+    const li = document.createElement('li');
+    li.id = `task-${task.id}`;
+    if (task.completed) li.classList.add('done');
+
+    li.innerHTML = `
+      <div class="check" data-id="${task.id}" title="Toggle complete">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <polyline points="1.5,6 4.5,9 10.5,3" stroke="#0f0f11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="task-text">${escapeHtml(task.text)}</span>
+      <button class="del-btn" data-id="${task.id}" title="Delete">✕</button>
+    `;
+
+    list.appendChild(li);
+  }
+
+  // Safety: prevent XSS from task text
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, c =>
+      ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])
+    );
+  }
+
+  //Show a brief toast notification 
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  // Connection status badge 
+  socket.on('connect', () => {
+    statusEl.classList.add('connected');
+    statusTxt.textContent = 'Live';
+  });
+  socket.on('disconnect', () => {
+    statusEl.classList.remove('connected');
+    statusTxt.textContent = 'Disconnected';
+  });
+
+  // Receive full list on first connect 
+  socket.on('task:list', (serverTasks) => {
+    tasks = serverTasks;
+    renderAll();
+  });
+
+  // Someone added a task 
+  socket.on('task:added', (newTask) => {
+    tasks.push(newTask);
+    renderAll();
+    showToast('New task added');
+  });
+
+  // Someone toggled a task 
+  socket.on('task:updated', (updated) => {
+    tasks = tasks.map(t => t.id === updated.id ? updated : t);
+    renderAll();
+  });
+
+  //Someone deleted a task 
+  socket.on('task:deleted', (taskId) => {
+    tasks = tasks.filter(t => t.id !== taskId);
+    renderAll();
+    showToast('Task removed');
+  });
+
+  // User clicks ADD or presses Enter
+  function submitTask() {
+    const text = input.value.trim();
+    if (!text) return;
+    socket.emit('task:add', text);  // send to server
+    input.value = '';
+    input.focus();
+  }
+
+  addBtn.addEventListener('click', submitTask);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitTask();
+  });
+
+  // ── Delegated click handler on the list ─────────
+  list.addEventListener('click', (e) => {
+    // Toggle complete
+    const check = e.target.closest('.check');
+    if (check) {
+      socket.emit('task:toggle', Number(check.dataset.id));
+      return;
+    }
+
+    // Delete
+    const del = e.target.closest('.del-btn');
+    if (del) {
+      socket.emit('task:delete', Number(del.dataset.id));
+    }
+  });
+</script>
+</body>
+</html>
